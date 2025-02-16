@@ -27,7 +27,7 @@ const hyperswarmCDRT = async (options) => {
         if (name == 'doc') throw new Error(`cdrt name 'doc' is protected`);
         y[name].set(key, val);
         console.log(y[name].toJSON());
-        const update = Y.encodeStateAsUpdate(y.doc); // << errors here
+        const update = Y.encodeStateAsUpdate(y.doc);
         await broadcast(b4a.from(cbor.encode({ name, update })));
         done();
       });
@@ -37,7 +37,7 @@ const hyperswarmCDRT = async (options) => {
       return new Promise(async (done) => {
         if (name == 'doc') throw new Error(`cdrt name 'doc' is protected`);
         y[name].delete(key);
-        const update = Y.encodeStateAsUpdate(y.doc); // << errors here
+        const update = Y.encodeStateAsUpdate(y.doc);
         await broadcast(b4a.from(cbor.encode({ name, update })));
         done();
       });
