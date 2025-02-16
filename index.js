@@ -58,31 +58,27 @@ const hyperswarmCDRT = async (options) => {
       });
     };
 
-    swarm.on('connection', (peer, info) => {
+    swarm.on('connection', (peer, info) => { // todo: can the handling of this be done after swarm.flush
       const id = b4a.toString(peer.remotePublicKey, 'hex');
       console.log('peer', id);
       peers[id] = peer;
       peer.once('close', () => delete peers[id]);
       peer.on('data', async d => {
-        // console.log('data', d);
         const decoded = cbor.decode(b4a.from(d));
-        // console.log('decoded', decoded);
-
         if (y[decoded.name] === undefined) await getMap(decoded.name);
-
         Y.applyUpdate(y.doc, decoded.update);
         console.log(`${decoded.name}:`, y[decoded.name].toJSON()); // testing
       });
-      peer.on('error', e => console.log(`Connection error: ${e}`))
+      peer.on('error', e => console.log(`Connection error: ${e}`));
     });
     console.log(b4a.alloc(32).fill(options.join));
     const discovery = swarm.join(b4a.alloc(32).fill(options.join), { server: true, client: true });
     await discovery.flushed();
     await swarm.flush();
-    swarm.listen();
+    swarm.listen(); // todo: in the right order?
 
     resolve({
-      shared: y,
+      shared: y, // todo: can be better!
       getMap,
       mapSet,
       mapDel
