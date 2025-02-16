@@ -16,8 +16,7 @@ const hyperswarmCDRT = async (options) => {
       return new Promise(async (done) => {
         if (name == 'doc') throw new Error(`cdrt name 'doc' is protected`);
         y[name] = y.doc.getMap();
-        // const update = Y.encodeStateAsUpdate(y.doc); // todo: rpc tell them to make the new map
-        // await broadcast(b4a.from(cbor.encode({ name, update })));
+        // dont worry, they will create their own same map ...
         done();
       });
     }
@@ -65,7 +64,7 @@ const hyperswarmCDRT = async (options) => {
       peer.once('close', () => delete peers[id]);
       peer.on('data', async d => {
         const decoded = cbor.decode(b4a.from(d));
-        if (y[decoded.name] === undefined) await getMap(decoded.name);
+        if (y[decoded.name] === undefined) await getMap(decoded.name); // make the map if undefined
         Y.applyUpdate(y.doc, decoded.update);
         console.log(`${decoded.name}:`, y[decoded.name].toJSON()); // testing
       });
