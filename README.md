@@ -17,6 +17,7 @@ npm install "github:benzmuircroft/hyperswarmCRDT"
     join: 'myApp:test'
   });
   console.log('... waiting');
+  // will print "myDoc { myKey: 'myValue' }"
 })();
 ```
 ```js
