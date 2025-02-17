@@ -3,7 +3,7 @@
 CRDT on [Yjs](https://docs.yjs.dev/api/y.doc) shared via [hyperswarmRouter](https://github.com/benzmuircroft/hyperswarmRouter) = opinion / consensus / voting (WIP)
 
 ## TODO
-It has no storage besides ram.
+use whatever storage is recomended by Yjs because right now it has no storage besides ram.
 
 ## Installation
 ```
