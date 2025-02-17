@@ -1,5 +1,24 @@
 {
+  "name": "hyperswarmCRDT",
+  "version": "0.0.1",
+  "description": "CRDT on Yjs shared via hyperswarmRouter = opinion / consensus / voting",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/benzmuircroft/hyperswarmCRDT"
+  },
   "dependencies": {
     "yjs": "^13.6.23"
-  }
+  },
+  "keywords": [
+    "local-first",
+    "offline-first",
+    "distributed",
+    "p2p",
+    "CRDT",
+    "hyperswarm",
+    "database"
+  ],
+  "author": "Benz Muircroft",
+  "license": "MIT"
 }
