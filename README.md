@@ -1,4 +1,4 @@
-# 🕳️🥊HyperswarmCDRT 🐦‍⬛ 
+# 🕳️🥊HyperswarmCRDT 🐦‍⬛ 
 
 CRDT on Yjs shared via Hyperswarm = opinion / consensus / voting (WIP)
 
