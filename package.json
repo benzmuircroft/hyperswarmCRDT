@@ -1,7 +1,7 @@
 {
   "name": "hyperswarmCRDT",
   "version": "0.0.1",
-  "description": "CRDT on Yjs shared via hyperswarmRouter = opinion / consensus / voting",
+  "description": "CRDT on Yjs shared via hyperswarmRouter and stored using standard Yjs storage adaptors",
   "main": "index.js",
   "repository": {
     "type": "git",
