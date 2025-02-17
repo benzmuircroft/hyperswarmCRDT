@@ -12,7 +12,7 @@ npm install "github:benzmuircroft/hyperswarmCRDT"
 // First peer
 (async () => {
   const router = await require('hyperswarmRouter')('c915296031bf40b58ef7f1d6b883512e799c1982b83acdc7ce27a2079a8c196f');
-  const x = await require('hyperswarmCRDT')({
+  const crdt = await require('hyperswarmCRDT')({
     network: router,
     join: 'myApp:test'
   });
@@ -24,15 +24,12 @@ npm install "github:benzmuircroft/hyperswarmCRDT"
 // Second peer
 (async () => {
   const router = await require('hyperswarmRouter')('c915296031bf40b58ef7f1d6b883512e799c1982b83acdc7ce27a2079a8c196f');
-  const x = await require('hyperswarmCRDT')({
+  const crdt = await require('hyperswarmCRDT')({
     network: router,
     join: 'myApp:test'
   });
   console.log('... ready to share');
-  
-  x.getMap('myDoc');
-
-  await x.mapSet('myDoc', 'myKey', 'myValue');
-  
+  crdt.getMap('myDoc');
+  await crdt.mapSet('myDoc', 'myKey', 'myValue');
 })();
 ```
