@@ -4,7 +4,7 @@ CRDT on Yjs shared via Hyperswarm = opinion / consensus / voting (WIP)
 
 ## Installation
 ```
-npm install "github:benzmuircroft/hyperswarmCDRT"
+npm install "github:benzmuircroft/hyperswarmCRDT"
 ```
 
 ## Usage
