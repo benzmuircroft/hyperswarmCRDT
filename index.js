@@ -2,7 +2,7 @@ const hyperswarmCRDT = async (options) => {
   return new Promise(async (resolve) => {
 
     if (typeof options.join !== 'string') throw new Error('options.join should be a string');
-    if (options.network?.instanceOf != 'hyperswarmRouter') throw new Error('network must be an instanceOf hyperswarmRouter');
+    if (!options.network?.isHyperswarmRouter) throw new Error('network must be an instanceOf hyperswarmRouter');
 
     const Y = await import('yjs');
     
