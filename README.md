@@ -1,6 +1,6 @@
 # 🕳️🥊HyperswarmCRDT 🐦‍⬛ 
 
-CRDT on [Yjs](https://docs.yjs.dev/api/y.doc) shared via [hyperswarmRouter](https://github.com/benzmuircroft/hyperswarmRouter) = opinion / consensus / voting (WIP)
+CRDT on [Yjs](https://docs.yjs.dev/api/y.doc) shared via [hyperswarmRouter](https://github.com/benzmuircroft/hyperswarmRouter) and stored using standard Yjs storage adaptors.
 
 ## TODO
 Use whatever storage is recomended by Yjs because right now it has no storage besides ram.
