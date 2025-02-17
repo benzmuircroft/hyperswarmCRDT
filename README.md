@@ -33,3 +33,12 @@ npm install "github:benzmuircroft/hyperswarmCRDT"
   await crdt.mapSet('myDoc', 'myKey', 'myValue');
 })();
 ```
+
+## API
+```js
+crdt.getMap('myDoc'); // create a map
+
+await crdt.mapSet('myDoc', 'myKey', 'myValue'); // add/update a key
+
+await crdt.mapDel('myDoc', 'myKey'); // delete a key
+```
