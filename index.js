@@ -44,7 +44,7 @@ const hyperswarmCRDT = async (options) => {
     broadcast = await options.network.join(options.join, async function handler(d) {
       if (y[d.name] === undefined) await getMap(d.name);
       Y.applyUpdate(y.doc, d.update);
-      console.log(`${d.name}:`, y[d.name].toJSON()); // testing
+      if (options.testing) console.log(`${d.name}:`, y[d.name].toJSON()); // testing
     });
 
     resolve({
