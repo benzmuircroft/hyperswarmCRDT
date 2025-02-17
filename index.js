@@ -1,4 +1,4 @@
-const hyperswarmCDRT = async (options) => {
+const hyperswarmCRDT = async (options) => {
   return new Promise(async (resolve) => {
 
     if (typeof options.join !== 'string' && options.join.length != 64) throw new Error('options.join should be a 64 character hex code');
@@ -14,16 +14,17 @@ const hyperswarmCDRT = async (options) => {
 
     function getMap(name) {
       return new Promise(async (done) => {
-        if (name == 'doc') throw new Error(`cdrt name 'doc' is protected`);
+        if (name == 'doc') throw new Error(`crdt name 'doc' is protected`);
         y[name] = y.doc.getMap();
-        // dont worry, they will create their own same map ...
+        // const update = Y.encodeStateAsUpdate(y.doc); // todo: rpc tell them to make the new map
+        // await broadcast(b4a.from(cbor.encode({ name, update })));
         done();
       });
     }
     
     function mapSet(name, key, val) {
       return new Promise(async (done) => {
-        if (name == 'doc') throw new Error(`cdrt name 'doc' is protected`);
+        if (name == 'doc') throw new Error(`crdt name 'doc' is protected`);
         y[name].set(key, val);
         console.log(y[name].toJSON());
         const update = Y.encodeStateAsUpdate(y.doc);
@@ -34,7 +35,7 @@ const hyperswarmCDRT = async (options) => {
 
     function mapDel(name, key) {
       return new Promise(async (done) => {
-        if (name == 'doc') throw new Error(`cdrt name 'doc' is protected`);
+        if (name == 'doc') throw new Error(`crdt name 'doc' is protected`);
         y[name].delete(key);
         const update = Y.encodeStateAsUpdate(y.doc);
         await broadcast(b4a.from(cbor.encode({ name, update })));
@@ -64,7 +65,7 @@ const hyperswarmCDRT = async (options) => {
       peer.once('close', () => delete peers[id]);
       peer.on('data', async d => {
         const decoded = cbor.decode(b4a.from(d));
-        if (y[decoded.name] === undefined) await getMap(decoded.name); // make the map if undefined
+        if (y[decoded.name] === undefined) await getMap(decoded.name);
         Y.applyUpdate(y.doc, decoded.update);
         console.log(`${decoded.name}:`, y[decoded.name].toJSON()); // testing
       });
@@ -86,4 +87,4 @@ const hyperswarmCDRT = async (options) => {
   });
 };
 
-module.exports = hyperswarmCDRT;
+module.exports = hyperswarmCRDT;
