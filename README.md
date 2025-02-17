@@ -1,6 +1,6 @@
 # 🕳️🥊HyperswarmCRDT 🐦‍⬛ 
 
-CRDT on Yjs shared via hyperswarmRouter = opinion / consensus / voting (WIP)
+CRDT on Yjs shared via [hyperswarmRouter](https://github.com/benzmuircroft/hyperswarmRouter) = opinion / consensus / voting (WIP)
 
 ## Installation
 ```
