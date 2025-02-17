@@ -14,7 +14,7 @@ npm install "github:benzmuircroft/hyperswarmCRDT"
   const router = await require('hyperswarmRouter')('c915296031bf40b58ef7f1d6b883512e799c1982b83acdc7ce27a2079a8c196f');
   const crdt = await require('hyperswarmCRDT')({
     network: router,
-    join: 'myApp:test'
+    join: 'same-room-as-each-other-with-other-peers'
   });
   console.log('... waiting');
   // will print "myDoc { myKey: 'myValue' }"
@@ -26,7 +26,7 @@ npm install "github:benzmuircroft/hyperswarmCRDT"
   const router = await require('hyperswarmRouter')('c915296031bf40b58ef7f1d6b883512e799c1982b83acdc7ce27a2079a8c196f');
   const crdt = await require('hyperswarmCRDT')({
     network: router,
-    join: 'myApp:test'
+    join: 'same-room-as-each-other-with-other-peers'
   });
   console.log('... ready to share');
   crdt.getMap('myDoc');
