@@ -9,7 +9,7 @@ const hyperswarmCRDT = async (options) => {
     let 
     //  LeveldbPersistence
     //, 
-      persistence
+      persistence // last session or new session
     , y// the doc + the xi to json
     , h // handlers + ix handler (meaning all handlers including ix)
     , c // cache - ix
