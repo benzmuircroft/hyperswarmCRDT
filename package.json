@@ -18,7 +18,8 @@
     "p2p",
     "CRDT",
     "hyperswarm",
-    "database"
+    "database",
+    "leveldb"
   ],
   "author": "Benz Muircroft",
   "license": "MIT"
