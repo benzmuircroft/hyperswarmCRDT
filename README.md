@@ -4,7 +4,7 @@ CRDT on [Yjs](https://docs.yjs.dev/api/y.doc) shared via [hyperswarmRouter](http
 
 ## TODO
 - Add y-array
-- WIP: allow an leader with the optional observerFunction to also broadcast task-at-hand
+- WIP: allow a leader with the optional observerFunction to also broadcast task-at-hand
 
 ## Installation
 ```
