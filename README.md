@@ -20,10 +20,12 @@ npm install "github:benzmuircroft/hyperswarmCRDT"
     network: router,
     join: 'same-room-as-each-other-with-other-peers',
     // leveldb: './leveldb', // using RAM instead
-    testing: true // to log changes
+    observerFunction: function(output) {
+      console.log('output:', output);
+    }
   });
   console.log('... waiting');
-  // will print "myDoc { myKey: 'myValue' }"
+  // will print "myDoc { myKey: 'myValue' }" from the observer function
 })();
 ```
 ```js
