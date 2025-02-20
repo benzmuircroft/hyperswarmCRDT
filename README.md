@@ -21,11 +21,14 @@ npm install "github:benzmuircroft/hyperswarmCRDT"
     join: 'same-room-as-each-other-with-other-peers',
     // leveldb: './leveldb', // using RAM instead
     observerFunction: function(output) {
-      console.log('output:', output);
+      console.log(output);
     }
   });
   console.log('... waiting');
-  // will print "myDoc { myKey: 'myValue' }" from the observer function
+  // will print output from the observer function
+  // "myDoc {}"
+  // "myDoc { myKey: 'myValue' }"
+  // (note: this user can access all methods just as the second user below ...)
 })();
 ```
 ```js
@@ -38,12 +41,12 @@ npm install "github:benzmuircroft/hyperswarmCRDT"
     join: 'same-room-as-each-other-with-other-peers'
   });
   console.log('... ready to share');
-  console.log('0 crdt:', crdt);
+  console.log('0 crdt:', crdt); // 0 crdt: {}
   crdt.get('myDoc');
-  console.log('1 crdt:', crdt);
+  console.log('1 crdt:', crdt); // 1 crdt: { myDoc: {} }
   console.log('shared:', crdt.myDoc ? crdt.myDoc : 'nothing yet');
   await crdt.set('myDoc', 'myKey', 'myValue');
-  console.log('2 crdt:', crdt);
+  console.log('2 crdt:', crdt); // 2 crdt: { myDoc: { myKey: 'MyVal' } }
 })();
 ```
 
