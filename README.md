@@ -1,9 +1,10 @@
 # 🕳️🥊HyperswarmCRDT 🐦‍⬛ 
 
-CRDT on [Yjs](https://docs.yjs.dev/api/y.doc) shared via [hyperswarmRouter](https://github.com/benzmuircroft/hyperswarmRouter) and stored using standard Yjs storage adaptors.
+CRDT on [Yjs](https://docs.yjs.dev/api/y.doc) shared via [hyperswarmRouter](https://github.com/benzmuircroft/hyperswarmRouter) and stored using standard y-leveldb storage adaptor.
 
 ## TODO
-Use whatever storage is recomended by Yjs because right now it has no storage besides ram.
+- Add y-array
+- WIP: allow an leader with the optional observerFunction to also broadcast task-at-hand
 
 ## Installation
 ```
@@ -33,16 +34,26 @@ npm install "github:benzmuircroft/hyperswarmCRDT"
     join: 'same-room-as-each-other-with-other-peers'
   });
   console.log('... ready to share');
-  crdt.getMap('myDoc');
-  await crdt.mapSet('myDoc', 'myKey', 'myValue');
+  console.log('0 crdt:', crdt);
+  crdt.get('myDoc');
+  console.log('1 crdt:', crdt);
+  console.log('shared:', crdt.myDoc ? crdt.myDoc : 'nothing yet');
+  await crdt.set('myDoc', 'myKey', 'myValue');
+  console.log('2 crdt:', crdt);
 })();
 ```
 
 ## API
 ```js
-crdt.getMap('myDoc'); // create a map
+crdt.get('myDoc'); // create a map
 
-await crdt.mapSet('myDoc', 'myKey', 'myValue'); // add or update a key
+await crdt.set('myDoc', 'myKey', 'myValue'); // add or update a key
 
-await crdt.mapDel('myDoc', 'myKey'); // delete a key
+await crdt.del('myDoc', 'myKey'); // delete a key
+
+console.log(crdt); // will print the whole shared object
+
+console.log(crdt.myDoc); // prints a map 
+
+console.log(crdt.myDoc.myKey); // prints the value of a map's key
 ```
