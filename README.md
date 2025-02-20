@@ -15,7 +15,7 @@ npm install "github:benzmuircroft/hyperswarmCRDT"
 ```js
 // First peer
 (async () => {
-  const router = await require('hyperswarmRouter')('c915296031bf40b58ef7f1d6b883512e799c1982b83acdc7ce27a2079a8c196f');
+  const router = await require('hyperswarmRouter')('c915296031bf40b58ef7f1d6b883512e799c1982b83acdc7ce27a2079a8c196f'); // any 64 hex
   const crdt = await require('hyperswarmCRDT')({
     network: router,
     join: 'same-room-as-each-other-with-other-peers',
@@ -34,7 +34,7 @@ npm install "github:benzmuircroft/hyperswarmCRDT"
 ```js
 // Second peer
 (async () => {
-  const router = await require('hyperswarmRouter')('c915296031bf40b58ef7f1d6b883512e799c1982b83acdc7ce27a2079a8c196f');
+  const router = await require('hyperswarmRouter')('c915296031bf40b58ef7f1d6b883512e799c1982b83acdc7ce27a2079a8c196f'); // any 64 hex
   const crdt = await require('hyperswarmCRDT')({
     network: router,
     leveldb: './leveldb', // using persistance (name the folder what you like)
