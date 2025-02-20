@@ -55,11 +55,13 @@ const hyperswarmCRDT = async (options) => {
       h.ix = y.doc.getMap();
     }
 
-    const errProtected = `crdt names 'ix, doc' are protected`;
+    const __ERROR = {
+      PROTECTED: `crdt names 'ix, doc' are protected`
+    };
 
     async function getMap(name) {
       return new Promise(async (done) => {
-        if (['ix', 'doc'].includes(name)) throw new Error(errProtected);
+        if (['ix', 'doc'].includes(name)) throw new Error(__ERROR.PROTECTED);
         else if (!h[name]) {
           h[name] = y.doc.getMap();
         }
@@ -80,7 +82,7 @@ const hyperswarmCRDT = async (options) => {
     
     async function mapSet(name, key, val) {
       return new Promise(async (done) => {
-        if (['ix', 'doc'].includes(name)) throw new Error(errProtected);
+        if (['ix', 'doc'].includes(name)) throw new Error(__ERROR.PROTECTED);
         h[name].set(key, val);
         console.log(h[name].toJSON());
         const update = Yjs.encodeStateAsUpdate(y.doc);
@@ -92,7 +94,7 @@ const hyperswarmCRDT = async (options) => {
 
     async function mapDel(name, key) {
       return new Promise(async (done) => {
-        if (['ix', 'doc'].includes(name)) throw new Error(errProtected);
+        if (['ix', 'doc'].includes(name)) throw new Error(__ERROR.PROTECTED);
         h[name].delete(key);
         const update = Yjs.encodeStateAsUpdate(y.doc);
         if (options.leveldb) await persistence.storeUpdate(options.leveldb, update);
