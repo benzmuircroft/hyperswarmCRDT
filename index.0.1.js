@@ -48,7 +48,7 @@ const hyperswarmCRDT = async (options) => {
     });
 
     resolve({
-      shared: y, // todo: can be better!
+      y, // todo: can be better!
       getMap,
       mapSet,
       mapDel
