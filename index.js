@@ -15,8 +15,6 @@ const hyperswarmCRDT = async (options) => {
     , broadcast
     ;
 
-
-
     if (options.leveldb) {
       LeveldbPersistence = (await import('y-leveldb')).LeveldbPersistence;
       persistence = new LeveldbPersistence(options.leveldb);
