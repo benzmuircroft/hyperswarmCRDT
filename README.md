@@ -1,6 +1,6 @@
 # 🕳️🥊HyperswarmCRDT 🐦‍⬛ 
 
-CRDT on [Yjs](https://docs.yjs.dev/api/y.doc) shared via [hyperswarmRouter](https://github.com/benzmuircroft/hyperswarmRouter) and stored using standard y-leveldb storage adaptor.
+CRDT for y-map on [Yjs](https://docs.yjs.dev/api/y.doc) shared via [hyperswarmRouter](https://github.com/benzmuircroft/hyperswarmRouter) and stored using standard [y-leveldb](https://github.com/yjs/y-leveldb) storage adaptor.
 
 ## TODO
 - Add y-array
