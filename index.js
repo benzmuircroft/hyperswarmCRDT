@@ -26,15 +26,12 @@ const hyperswarmCRDT = async (options) => {
       if (stateVector && stateVector.length > 1) {  // existing data
         h.ix = y.doc.getMap('ix');
         y.ix = h.ix.toJSON();
-        console.log('old');
       }
       else { // just created data
         h.ix = y.doc.getMap('ix');
         y.ix = {};
-        console.log('new');
       }
       // unload y.doc into h using y.ix
-      console.log(Object.keys(y.ix).length);
       c = {};
       if (Object.keys(y.ix).length > 0) {
         for (const key of Object.keys(y.ix)) { // from y = ({ ix, doc }).ix
@@ -110,7 +107,6 @@ const hyperswarmCRDT = async (options) => {
         }
         c[key] = h[key].toJSON(); // get the real objects from the y.ix keys and translate them to getting from the handlers
       }
-      if (options.testing) console.log(`${d.name}:`, h[d.name].toJSON()); // testing
       // trigger the observer who could be one or many leader roles
       // they could add functionality or a new task
       if (options.observerFunction) {
