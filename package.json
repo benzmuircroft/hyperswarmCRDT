@@ -8,7 +8,8 @@
     "url": "https://github.com/benzmuircroft/hyperswarmCRDT"
   },
   "dependencies": {
-    "yjs": "^13.6.23"
+    "yjs": "^13.6.23",
+    "y-leveldb": "^0.1.2"
   },
   "keywords": [
     "local-first",
