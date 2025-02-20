@@ -11,7 +11,7 @@ const hyperswarmCRDT = async (options) => {
     const y = {
       doc: new Y.Doc()
     };
-
+ 
     function getMap(name) {
       return new Promise(async (done) => {
         if (name == 'doc') throw new Error(`crdt name 'doc' is protected`);
