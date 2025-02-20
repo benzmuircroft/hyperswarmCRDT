@@ -100,7 +100,14 @@ const hyperswarmCRDT = async (options) => {
         done();
       });
     }
-    
+
+
+    /*
+    * setup joining a sub-topic on the network
+    * feed it a handler and a higher handler function
+    * return a broadcaster for this network sub-topic
+    * todo: setup subscriptions for sub-topics in broadcast (it sends to everyone right now like a machine gun!)
+    */
     broadcast = await options.network.join(options.join, async function handler(d) {
       // if (h[d.name] === undefined) await getMap(d.name);
       Yjs.applyUpdate(y.doc, d.update);
