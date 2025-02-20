@@ -63,11 +63,10 @@ const hyperswarmCRDT = async (options) => {
       return new Promise(async (done) => {
         if (['ix', 'doc'].includes(name)) throw new Error(__ERROR.PROTECTED);
         else if (!h[name]) {
-          h[name] = y.doc.getMap();
+          h[name] = y.doc.getMap(); // say      what it is in h.ix external handler
         }
         if (!y.ix[name]) {
-          y.ix[name] = 'map';    // mirror what it is in y.ix internal
-          h.ix.set(name, 'map'); // say    what it is in h.ix external handler
+          y.ix[name] = 'map';       // mirror   what it is in y.ix internal
           // dont do it in c because c.ix does not exist there
           // because the json object for h.ix is in y.ix
           // whereas every h.name's json object is in c.name
