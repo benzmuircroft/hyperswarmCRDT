@@ -65,9 +65,12 @@ const hyperswarmCRDT = async (options) => {
         else if (!h[name]) {
           h[name] = y.doc.getMap();
         }
-        if (!h.ix[name]) {
-          // h.ix[name] = 'map';
-          y.ix.set(name, 'map'); // y.doc.ix.set(name, 'map');
+        if (!y.ix[name]) {
+          y.ix[name] = 'map';    // mirror what it is in y.ix internal
+          h.ix.set(name, 'map'); // say    what it is in h.ix external handler
+          // dont do it in c because c.ix does not exist there
+          // because the json object for h.ix is in y.ix
+          // whereas every h.name's json object is in c.name
           //
           console.log('test1:', y.doc.ix, h.ix);
           console.log('test2:', h.ix.toJSON());
