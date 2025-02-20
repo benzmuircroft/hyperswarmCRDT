@@ -59,7 +59,7 @@ const hyperswarmCRDT = async (options) => {
       PROTECTED: `crdt names 'ix, doc' are protected`
     };
 
-    async function getMap(name) {
+    async function getMap(name) { // todo: is getMap used and when does y.ix[name] not exist? during loading?? ...
       return new Promise(async (done) => {
         if (['ix', 'doc'].includes(name)) throw new Error(__ERROR.PROTECTED);
         else if (!h[name]) {
