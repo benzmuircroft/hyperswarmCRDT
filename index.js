@@ -41,7 +41,7 @@ const hyperswarmCRDT = async (options) => {
       }
     }
     else {
-      h = {
+      y = {
         ix: undefined, // index list of crdt-name = map
         doc: new Yjs.Doc()
       };
