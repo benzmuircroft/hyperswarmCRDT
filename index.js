@@ -73,6 +73,7 @@ const hyperswarmCRDT = async (options) => {
     async function set(name, key, val) {
       return new Promise(async (done) => {
         if (['ix', 'doc'].includes(name)) throw new Error(errProtected);
+        if (!h[name]) await get(name);
         h[name].set(key, val);
         c[name][key] = val;
         console.log(h[name].toJSON());
