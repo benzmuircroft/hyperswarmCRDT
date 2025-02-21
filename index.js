@@ -76,7 +76,6 @@ const hyperswarmCRDT = async (options) => {
         if (!h[name]) await get(name);
         h[name].set(key, val);
         c[name][key] = val;
-        console.log(h[name].toJSON());
         const update = Yjs.encodeStateAsUpdate(y.doc);
         if (options.leveldb) await persistence.storeUpdate(options.leveldb, update);
         await broadcast({ name, update });
