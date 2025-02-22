@@ -26,7 +26,7 @@ const hyperswarmCRDT = async (options) => {
       LeveldbPersistence
     , persistence
     , y = {} // The Yjs document and its index (ix) in JSON format
-    , h = {} // Handlers for Yjs maps and the index handler
+    , h = {} // Handlers for Yjs maps/arrays and the index handler
     , c = {} // Cache for the current state of the CRDT
     , broadcast // Function to broadcast updates to the network
     ;
@@ -48,12 +48,13 @@ const hyperswarmCRDT = async (options) => {
         h.ix = y.doc.getMap('ix'); // Create a new index map
         y.ix = {}; // Initialize the index as an empty object
       }
-      // Load existing maps from the index into handlers and cache
+      // Load existing maps and arrays from the index into handlers and cache
       c = {};
       if (Object.keys(y.ix).length > 0) {
-        for (const key of Object.keys(y.ix)) { // Iterate over the index keys
-          h[key] = y.doc.getMap(key); // Create a handler for each map
-          c[key] = h[key].toJSON(); // Cache the current state of the map
+        for (const [key, val] of Object.keys(y.ix)) { // Iterate over the index keys
+          if (val == 'map') h[key] = y.doc.getMap(key); // Create a handler for each map
+          else h[key] = y.doc.getArray(key); // or array
+          c[key] = h[key].toJSON(); // Cache the current state of the map or array
         }
       }
     }
@@ -69,23 +70,29 @@ const hyperswarmCRDT = async (options) => {
 
     // Error message for protected CRDT names
     const errProtected = `crdt names 'ix, doc' are protected`;
+    const errType = `supported crdt types include 'map, array' only`;
+    const errMapExpected = `this function is for 'map' only`;
+    const errArrayExpected = `this function is for 'array' only`;
 
     /**
      * Get or create a new map in the CRDT.
-     * 
-     * @param {string} name - The name of the map to get or create.
-     * @returns {Promise<void>} - Resolves when the map is ready.
+     *
+     * @param {string} type - map or array. 
+     * @param {string} name - The name of the map/array to get or create.
+     * @returns {Promise<void>} - Resolves when the map/array is ready.
      */
-    async function get(name) {
+    async function get(type, name) {
       return new Promise(async (done) => {
         if (['ix', 'doc'].includes(name)) throw new Error(errProtected); // Prevent overwriting protected names
+        if (!['map', 'array'].includes(type)) throw new Error(errType); // only supported crdt types
         else if (!h[name]) { // If the map doesn't exist
-          h[name] = y.doc.getMap(name); // Create a new map
+          if (type == 'map') h[name] = y.doc.getMap(name); // Create a new map
+          else h[name] = y.doc.getArray(name); // Create a new array
         }
         c[name] = h[name].toJSON(); // Update the cache with the map's current state
         if (!y.ix[name]) { // If the map is not in the index
-          y.ix[name] = 'map'; // Add it to the index
-          h.ix.set(name, y.ix[name]); // Update the index map
+          y.ix[name] = type; // Add it to the index
+          h.ix.set(type, name, y.ix[name]); // Update the index map
           const update = Yjs.encodeStateAsUpdate(y.doc); // Encode the update
           if (options.leveldb) await persistence.storeUpdate(options.leveldb, update); // Persist the update
           await broadcast({ name, update }); // Broadcast the update to the network
@@ -105,7 +112,8 @@ const hyperswarmCRDT = async (options) => {
     async function set(name, key, val) {
       return new Promise(async (done) => {
         if (['ix', 'doc'].includes(name)) throw new Error(errProtected); // Prevent overwriting protected names
-        if (!h[name]) await get(name); // create the map if it doesn't exist
+        if (y.ix != 'map') throw new Error(errMapExpected); // limit this function to use with maps
+        if (!h[name]) await get('map', name); // create the map if it doesn't exist
         h[name].set(key, val); // Set the key-value pair in the map
         c[name][key] = val; // Update the cache
         const update = Yjs.encodeStateAsUpdate(y.doc); // Encode the update
@@ -125,9 +133,84 @@ const hyperswarmCRDT = async (options) => {
     async function del(name, key) {
       return new Promise(async (done) => {
         if (['ix', 'doc'].includes(name)) throw new Error(errProtected); // Prevent overwriting protected names
+        if (y.ix != 'map') throw new Error(errMapExpected); // limit this function to use with maps
         h[name].delete(key); // Delete the key from the map
         delete c[name][key]; // Update the cache
         const update = Yjs.encodeStateAsUpdate(y.doc); // Encode the update
+        if (options.leveldb) await persistence.storeUpdate(options.leveldb, update); // Persist the update
+        await broadcast({ name, update }); // Broadcast the update to the network
+        done();
+      });
+    }
+
+    /**
+     * Inserts content at specified index in the named array
+     * @param {string} name - Array identifier
+     * @param {number} index - Position to insert at
+     * @param {*} content - Content to insert
+     * @returns {Promise} Resolves when operation completes
+     */
+    async function insert(name, index, content) {
+      return new Promise(async (done) => {
+        if (['ix', 'doc'].includes(name)) throw new Error(errProtected); // Prevent overwriting protected names
+        if (y.ix != 'array') throw new Error(errArrayExpected); // limit this function to use with arrays
+        h[name].insert(index, content); // modify
+        c[name] = h[name].toJSON(); // Update the cache
+        if (options.leveldb) await persistence.storeUpdate(options.leveldb, update); // Persist the update
+        await broadcast({ name, update }); // Broadcast the update to the network
+        done();
+      });
+    }
+
+    /**
+     * Adds value to end of the named array
+     * @param {string} name - Array identifier  
+     * @param {*} val - Value to append
+     * @returns {Promise} Resolves when operation completes
+     */
+    async function push(name, val) {
+      return new Promise(async (done) => {
+        if (['ix', 'doc'].includes(name)) throw new Error(errProtected); // Prevent overwriting protected names
+        if (y.ix != 'array') throw new Error(errArrayExpected); // limit this function to use with arrays
+        h[name].push(val); // modify
+        c[name] = h[name].toJSON(); // Update the cache
+        if (options.leveldb) await persistence.storeUpdate(options.leveldb, update); // Persist the update
+        await broadcast({ name, update }); // Broadcast the update to the network
+        done();
+      });
+    }
+
+    /**
+     * Adds value to beginning of the named array
+     * @param {string} name - Array identifier
+     * @param {*} val - Value to prepend
+     * @returns {Promise} Resolves when operation completes
+     */
+    async function unshift(name, val) {
+      return new Promise(async (done) => {
+        if (['ix', 'doc'].includes(name)) throw new Error(errProtected); // Prevent overwriting protected names
+        if (y.ix != 'array') throw new Error(errArrayExpected); // limit this function to use with arrays
+        h[name].unshift(val); // modify
+        c[name] = h[name].toJSON(); // Update the cache
+        if (options.leveldb) await persistence.storeUpdate(options.leveldb, update); // Persist the update
+        await broadcast({ name, update }); // Broadcast the update to the network
+        done();
+      });
+    }
+
+    /**
+     * Removes elements from the named array
+     * @param {string} name - Array identifier
+     * @param {number} index - Starting position to remove from
+     * @param {number} length - Number of elements to remove
+     * @returns {Promise} Resolves when operation completes
+     */
+    async function cut(name, index, length) {
+      return new Promise(async (done) => {
+        if (['ix', 'doc'].includes(name)) throw new Error(errProtected); // Prevent overwriting protected names
+        if (y.ix != 'array') throw new Error(errArrayExpected); // limit this function to use with arrays
+        h[name].delete(index, length); // modify
+        c[name] = h[name].toJSON(); // Update the cache
         if (options.leveldb) await persistence.storeUpdate(options.leveldb, update); // Persist the update
         await broadcast({ name, update }); // Broadcast the update to the network
         done();
@@ -141,9 +224,10 @@ const hyperswarmCRDT = async (options) => {
       // Update local handlers and cache based on the index map
       const diffs = y.doc.ix.toJSON();
       for (const [key, value] of Object.entries(diffs)) { // Iterate over the index map
-        if (!y.ix[key]) { // If the map is not in the local index
+        if (!y.ix[key]) { // If the map/array is not in the local index
           y.ix[key] = value; // Add it to the index
           if (value == 'map') h[key] = y.doc.getMap(key); // Create a handler for the map
+          else h[key] = y.doc.getArray(key); // Create a handler for the array
         }
         c[key] = h[key].toJSON(); // Update the cache
       }
@@ -160,9 +244,13 @@ const hyperswarmCRDT = async (options) => {
         get() { return Object.freeze({ ...c }) }
       },
       // Define non-enumerable method properties
-      get: { value: get },  // Method to get/create new maps
+      get: { value: get },  // Method to get/create new maps or arrays
       set: { value: set },  // Method to set values in maps
       del: { value: del },  // Method to delete values from maps
+      insert: { value: insert }, // Method to insert content into arrays
+      push: { value: push }, // Method to put a value to the back of an array
+      unshift: { value: unshift }, // Method to put a value at the front of an array
+      cut: { value: cut } // Method to remove a index from an array
     });
 
     // Add proxy to handle direct property access
