@@ -77,22 +77,19 @@ const hyperswarmCRDT = async (options) => {
     /**
      * Get or create a new map in the CRDT.
      *
-     * @param {string} type - map or array. 
-     * @param {string} name - The name of the map/array to get or create.
-     * @returns {Promise<void>} - Resolves when the map/array is ready.
+     * @param {string} name - The name of the map to get or create.
+     * @returns {Promise<void>} - Resolves when the map is ready.
      */
-    async function get(type, name) {
+    async function map(name) {
       return new Promise(async (done) => {
         if (['ix', 'doc'].includes(name)) throw new Error(errProtected); // Prevent overwriting protected names
-        if (!['map', 'array'].includes(type)) throw new Error(errType); // only supported crdt types
         else if (!h[name]) { // If the map doesn't exist
-          if (type == 'map') h[name] = y.doc.getMap(name); // Create a new map
-          else h[name] = y.doc.getArray(name); // Create a new array
+          h[name] = y.doc.getMap(name); // Create a new map
         }
         c[name] = h[name].toJSON(); // Update the cache with the map's current state
         if (!y.ix[name]) { // If the map is not in the index
-          y.ix[name] = type; // Add it to the index
-          h.ix.set(type, name, y.ix[name]); // Update the index map
+          y.ix[name] = 'map'; // Add it to the index
+          h.ix.set(name, y.ix[name]); // Update the index map
           const update = Yjs.encodeStateAsUpdate(y.doc); // Encode the update
           if (options.leveldb) await persistence.storeUpdate(options.leveldb, update); // Persist the update
           await broadcast({ name, update }); // Broadcast the update to the network
@@ -113,7 +110,7 @@ const hyperswarmCRDT = async (options) => {
       return new Promise(async (done) => {
         if (['ix', 'doc'].includes(name)) throw new Error(errProtected); // Prevent overwriting protected names
         if (y.ix != 'map') throw new Error(errMapExpected); // limit this function to use with maps
-        if (!h[name]) await get('map', name); // create the map if it doesn't exist
+        if (!h[name]) await map(name); // create the map if it doesn't exist
         h[name].set(key, val); // Set the key-value pair in the map
         c[name][key] = val; // Update the cache
         const update = Yjs.encodeStateAsUpdate(y.doc); // Encode the update
@@ -139,6 +136,30 @@ const hyperswarmCRDT = async (options) => {
         const update = Yjs.encodeStateAsUpdate(y.doc); // Encode the update
         if (options.leveldb) await persistence.storeUpdate(options.leveldb, update); // Persist the update
         await broadcast({ name, update }); // Broadcast the update to the network
+        done();
+      });
+    }
+
+    /**
+     * Get or create a new array in the CRDT.
+     *
+     * @param {string} name - The name of the array to get or create.
+     * @returns {Promise<void>} - Resolves when the array is ready.
+     */
+    async function array(name) {
+      return new Promise(async (done) => {
+        if (['ix', 'doc'].includes(name)) throw new Error(errProtected); // Prevent overwriting protected names
+        else if (!h[name]) { // If the map doesn't exist
+          h[name] = y.doc.getArray(name); // Create a new array
+        }
+        c[name] = h[name].toJSON(); // Update the cache with the map's current state
+        if (!y.ix[name]) { // If the map is not in the index
+          y.ix[name] = 'array'; // Add it to the index
+          h.ix.set(name, y.ix[name]); // Update the index map
+          const update = Yjs.encodeStateAsUpdate(y.doc); // Encode the update
+          if (options.leveldb) await persistence.storeUpdate(options.leveldb, update); // Persist the update
+          await broadcast({ name, update }); // Broadcast the update to the network
+        }
         done();
       });
     }
@@ -244,9 +265,10 @@ const hyperswarmCRDT = async (options) => {
         get() { return Object.freeze({ ...c }) }
       },
       // Define non-enumerable method properties
-      get: { value: get },  // Method to get/create new maps or arrays
+      map: { value: map },  // Method to get/create new maps
       set: { value: set },  // Method to set values in maps
       del: { value: del },  // Method to delete values from maps
+      array: { value: array },  // Method to get/create new arrays
       insert: { value: insert }, // Method to insert content into arrays
       push: { value: push }, // Method to put a value to the back of an array
       unshift: { value: unshift }, // Method to put a value at the front of an array
