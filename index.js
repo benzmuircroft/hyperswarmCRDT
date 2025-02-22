@@ -109,7 +109,7 @@ const hyperswarmCRDT = async (options) => {
     async function set(name, key, val) {
       return new Promise(async (done) => {
         if (['ix', 'doc'].includes(name)) throw new Error(errProtected); // Prevent overwriting protected names
-        if (y.ix != 'map') throw new Error(errMapExpected); // limit this function to use with maps
+        if (y.ix[name] != 'map') throw new Error(errMapExpected); // limit this function to use with maps
         if (!h[name]) await map(name); // create the map if it doesn't exist
         h[name].set(key, val); // Set the key-value pair in the map
         c[name][key] = val; // Update the cache
@@ -130,7 +130,7 @@ const hyperswarmCRDT = async (options) => {
     async function del(name, key) {
       return new Promise(async (done) => {
         if (['ix', 'doc'].includes(name)) throw new Error(errProtected); // Prevent overwriting protected names
-        if (y.ix != 'map') throw new Error(errMapExpected); // limit this function to use with maps
+        if (y.ix[name] != 'map') throw new Error(errMapExpected); // limit this function to use with maps
         h[name].delete(key); // Delete the key from the map
         delete c[name][key]; // Update the cache
         const update = Yjs.encodeStateAsUpdate(y.doc); // Encode the update
@@ -174,7 +174,7 @@ const hyperswarmCRDT = async (options) => {
     async function insert(name, index, content) {
       return new Promise(async (done) => {
         if (['ix', 'doc'].includes(name)) throw new Error(errProtected); // Prevent overwriting protected names
-        if (y.ix != 'array') throw new Error(errArrayExpected); // limit this function to use with arrays
+        if (y.ix[name] != 'array') throw new Error(errArrayExpected); // limit this function to use with arrays
         h[name].insert(index, content); // modify
         c[name] = h[name].toJSON(); // Update the cache
         if (options.leveldb) await persistence.storeUpdate(options.leveldb, update); // Persist the update
@@ -192,7 +192,7 @@ const hyperswarmCRDT = async (options) => {
     async function push(name, val) {
       return new Promise(async (done) => {
         if (['ix', 'doc'].includes(name)) throw new Error(errProtected); // Prevent overwriting protected names
-        if (y.ix != 'array') throw new Error(errArrayExpected); // limit this function to use with arrays
+        if (y.ix[name] != 'array') throw new Error(errArrayExpected); // limit this function to use with arrays
         h[name].push(val); // modify
         c[name] = h[name].toJSON(); // Update the cache
         if (options.leveldb) await persistence.storeUpdate(options.leveldb, update); // Persist the update
@@ -210,7 +210,7 @@ const hyperswarmCRDT = async (options) => {
     async function unshift(name, val) {
       return new Promise(async (done) => {
         if (['ix', 'doc'].includes(name)) throw new Error(errProtected); // Prevent overwriting protected names
-        if (y.ix != 'array') throw new Error(errArrayExpected); // limit this function to use with arrays
+        if (y.ix[name] != 'array') throw new Error(errArrayExpected); // limit this function to use with arrays
         h[name].unshift(val); // modify
         c[name] = h[name].toJSON(); // Update the cache
         if (options.leveldb) await persistence.storeUpdate(options.leveldb, update); // Persist the update
@@ -229,7 +229,7 @@ const hyperswarmCRDT = async (options) => {
     async function cut(name, index, length) {
       return new Promise(async (done) => {
         if (['ix', 'doc'].includes(name)) throw new Error(errProtected); // Prevent overwriting protected names
-        if (y.ix != 'array') throw new Error(errArrayExpected); // limit this function to use with arrays
+        if (y.ix[name] != 'array') throw new Error(errArrayExpected); // limit this function to use with arrays
         h[name].delete(index, length); // modify
         c[name] = h[name].toJSON(); // Update the cache
         if (options.leveldb) await persistence.storeUpdate(options.leveldb, update); // Persist the update
