@@ -1,9 +1,8 @@
 # 🕳️🥊hyperswarmCRDT 🐦‍⬛ 
 
-CRDT for y-map on [Yjs](https://docs.yjs.dev/api/y.doc) shared via [hyperswarmRouter](https://github.com/benzmuircroft/hyperswarmRouter) and stored using standard [y-leveldb](https://github.com/yjs/y-leveldb) storage adaptor.
+CRDT for y-map and y-array on [Yjs](https://docs.yjs.dev/api/y.doc) shared via [hyperswarmRouter](https://github.com/benzmuircroft/hyperswarmRouter) and stored using standard [y-leveldb](https://github.com/yjs/y-leveldb) storage adaptor.
 
 ## TODO
-- Add y-array
 - WIP: allow a leader with the optional observerFunction to also broadcast task-at-hand
 
 ## Installation
@@ -42,7 +41,7 @@ npm install "github:benzmuircroft/hyperswarmCRDT"
   });
   console.log('... ready to share');
   console.log('0 crdt:', crdt); // 0 crdt: {}
-  crdt.get('myDoc');
+  crdt.map('myDoc');
   console.log('1 crdt:', crdt); // 1 crdt: { myDoc: {} }
   console.log('shared:', crdt.myDoc ? crdt.myDoc : 'nothing yet');
   await crdt.set('myDoc', 'myKey', 'myValue');
@@ -52,7 +51,7 @@ npm install "github:benzmuircroft/hyperswarmCRDT"
 
 ## API
 ```js
-crdt.get('myDoc'); // create a map
+crdt.map('myDoc'); // create a map
 
 await crdt.set('myDoc', 'myKey', 'myValue'); // add or update a key
 
