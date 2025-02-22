@@ -57,6 +57,16 @@ await crdt.set('myDoc', 'myKey', 'myValue'); // add or update a key
 
 await crdt.del('myDoc', 'myKey'); // delete a key
 
+await crdt.array('myArray'); // creates a array
+
+await crdt.insert('myArray', 1, ['a', 'b', 'c']); // inserts content at index
+
+await crdt.push('myArray', 'd'); // push value
+
+await crdt.unshift('myArray', 'd'); // unshift value
+
+await crdt.cut('myArray', 1); // remove an index
+
 console.log(crdt); // will print the whole shared object
 
 console.log(crdt.myDoc); // prints a map 
