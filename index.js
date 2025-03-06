@@ -70,9 +70,9 @@ const hyperswarmCRDT = async (options) => {
 
     // Error message for protected CRDT names
     const errProtected = `crdt names 'ix, doc' are protected`;
-    const errType = `supported crdt types include 'map, array' only`;
     const errMapExpected = `this function is for 'map' only`;
     const errArrayExpected = `this function is for 'array' only`;
+    const errArrayMethodExpected = `if you intend to use this function to manipulate an 'array' inside a 'map' you have malformed parameters`;
 
     /**
      * Get or create a new map in the CRDT.
@@ -106,12 +106,22 @@ const hyperswarmCRDT = async (options) => {
      * @param {any} val - The value to set.
      * @returns {Promise<void>} - Resolves when the update is complete.
      */
-    async function set(name, key, val) {
+    async function set(name, key, val, arrayMethod, optionalArrayParam0, optionalArrayParam1) {
       return new Promise(async (done) => {
         if (['ix', 'doc'].includes(name)) throw new Error(errProtected); // Prevent overwriting protected names
         if (!h[name]) await map(name); // create the map if it doesn't exist
         if (y.ix[name] != 'map') throw new Error(errMapExpected); // limit this function to use with maps
-        h[name].set(key, val); // Set the key-value pair in the map
+        if (arrayMethod && Array.isArray(val)) { // insert an array as key
+          if ((arrayMethod == 'insert' && typeof optionalArrayParam0 != 'number') 
+          ||  (['push', 'unshift'].contains(arrayMethod) && (optionalArrayParam0 || optionalArrayParam1)) 
+          ||  (arrayMethod == 'cut' && (typeof optionalArrayParam0 != 'number' || typeof optionalArrayParam1 != 'number' || val))) {
+            throw new Error(errArrayMethodExpected);
+          }
+          if (!h[name].has(key)) h[name].set(key, new Y.Array());
+          const yarray = h[name].get(key); // get the Yarray
+          yarray[arrayMethod](val, optionalArrayParam0, optionalArrayParam1);
+        }
+        else h[name].set(key, val); // Set the key-value pair in the map
         c[name][key] = val; // Update the cache
         const update = Yjs.encodeStateAsUpdate(y.doc); // Encode the update
         if (options.leveldb) await persistence.storeUpdate(options.leveldb, update); // Persist the update
@@ -172,12 +182,12 @@ const hyperswarmCRDT = async (options) => {
      * @param {*} content - Content to insert
      * @returns {Promise} Resolves when operation completes
      */
-    async function insert(name, index, content) {
+    async function insert(name, val, index) { // val is content meaning an array to insert at the index
       return new Promise(async (done) => {
         if (['ix', 'doc'].includes(name)) throw new Error(errProtected); // Prevent overwriting protected names
         if (!h[name]) await array(name); // create the array if it doesn't exist
         if (y.ix[name] != 'array') throw new Error(errArrayExpected); // limit this function to use with arrays
-        h[name].insert(index, content); // modify
+        h[name].insert(index, val); // modify
         c[name] = h[name].toJSON(); // Update the cache
         if (options.leveldb) await persistence.storeUpdate(options.leveldb, update); // Persist the update
         await broadcast({ name, update }); // Broadcast the update to the network
@@ -196,6 +206,7 @@ const hyperswarmCRDT = async (options) => {
         if (['ix', 'doc'].includes(name)) throw new Error(errProtected); // Prevent overwriting protected names
         if (!h[name]) await array(name); // create the array if it doesn't exist
         if (y.ix[name] != 'array') throw new Error(errArrayExpected); // limit this function to use with arrays
+        if (!Array.isArray(val)) val = [val];
         h[name].push(val); // modify
         c[name] = h[name].toJSON(); // Update the cache
         if (options.leveldb) await persistence.storeUpdate(options.leveldb, update); // Persist the update
@@ -245,21 +256,28 @@ const hyperswarmCRDT = async (options) => {
     
     // Join the Hyperswarm network and set up the broadcast handler
     broadcast = await options.network.join(options.join, async function handler(d) {
-      Yjs.applyUpdate(y.doc, d.update); // Apply the received update to the Yjs document
-      if (options.leveldb) await persistence.storeUpdate(options.leveldb, update); // Persist the update
-      // Update local handlers and cache based on the index map
-      const diffs = y.doc.ix.toJSON();
-      for (const [key, value] of Object.entries(diffs)) { // Iterate over the index map
-        if (!y.ix[key]) { // If the map/array is not in the local index
-          y.ix[key] = value; // Add it to the index
-          if (value == 'map') h[key] = y.doc.getMap(key); // Create a handler for the map
-          else h[key] = y.doc.getArray(key); // Create a handler for the array
+      if (!d.update) {
+        if (options.observerFunction) {
+          options.observerFunction(d); // Pass a message
         }
-        c[key] = h[key].toJSON(); // Update the cache
       }
-      // Trigger the observer function if provided
-      if (options.observerFunction) {
-        options.observerFunction(Object.freeze({ ...c })); // Pass a frozen copy of the cache
+      else {
+        Yjs.applyUpdate(y.doc, d.update); // Apply the received update to the Yjs document
+        if (options.leveldb) await persistence.storeUpdate(options.leveldb, update); // Persist the update
+        // Update local handlers and cache based on the index map
+        const diffs = y.doc.ix.toJSON();
+        for (const [key, value] of Object.entries(diffs)) { // Iterate over the index map
+          if (!y.ix[key]) { // If the map/array is not in the local index
+            y.ix[key] = value; // Add it to the index
+            if (value == 'map') h[key] = y.doc.getMap(key); // Create a handler for the map
+            else h[key] = y.doc.getArray(key); // Create a handler for the array
+          }
+          c[key] = h[key].toJSON(); // Update the cache
+        }
+        // Trigger the observer function if provided
+        if (options.observerFunction) {
+          options.observerFunction(Object.freeze({ ...c })); // Pass a frozen copy of the cache
+        }
       }
     });
     
@@ -277,7 +295,8 @@ const hyperswarmCRDT = async (options) => {
       insert: { value: insert }, // Method to insert content into arrays
       push: { value: push }, // Method to put a value to the back of an array
       unshift: { value: unshift }, // Method to put a value at the front of an array
-      cut: { value: cut } // Method to remove a index from an array
+      cut: { value: cut }, // Method to remove a index from an array
+      broadcast: { value: broadcast }
     });
 
     // Add proxy to handle direct property access
