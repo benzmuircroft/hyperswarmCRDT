@@ -74,4 +74,6 @@ console.log(crdt); // will print the whole shared object
 console.log(crdt.myMap); // prints a map 
 
 console.log(crdt.myMap.myKey); // prints the value of a map's key
+
+console.log(crdt.myMap.myArray[0]); // prints v
 ```
