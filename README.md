@@ -51,11 +51,11 @@ npm install "github:benzmuircroft/hyperswarmCRDT"
 
 ## API
 ```js
-crdt.map('myDoc'); // create a map
+crdt.map('myMap'); // create a map
 
-await crdt.set('myDoc', 'myKey', 'myValue'); // add or update a key
+await crdt.set('myMap', 'myKey', 'myValue'); // add or update a key
 
-await crdt.del('myDoc', 'myKey'); // delete a key
+await crdt.del('myMap', 'myKey'); // delete a key
 
 await crdt.array('myArray'); // creates a array
 
@@ -67,9 +67,11 @@ await crdt.unshift('myArray', 'd'); // unshift value
 
 await crdt.cut('myArray', 1); // remove an index
 
+await crdt.set('myMap', 'myArray', ['v', 'a', 'l', 'u', 'e', 's'], 'push');
+
 console.log(crdt); // will print the whole shared object
 
-console.log(crdt.myDoc); // prints a map 
+console.log(crdt.myMap); // prints a map 
 
-console.log(crdt.myDoc.myKey); // prints the value of a map's key
+console.log(crdt.myMap.myKey); // prints the value of a map's key
 ```
