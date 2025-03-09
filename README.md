@@ -67,7 +67,7 @@ await crdt.unshift('myArray', 'd'); // unshift value
 
 await crdt.cut('myArray', 1); // remove an index
 
-await crdt.set('myMap', 'myArray', ['v', 'a', 'l', 'u', 'e', 's'], 'push');
+await crdt.set('myMap', 'myArray', ['v', 'a', 'l', 'u', 'e', 's'], 'push'); // set a new or existing yarray inside an ymap via push
 
 console.log(crdt); // will print the whole shared object
 
